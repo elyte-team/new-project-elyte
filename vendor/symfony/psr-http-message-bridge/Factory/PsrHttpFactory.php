@@ -12,9 +12,7 @@
 namespace Symfony\Bridge\PsrHttpMessage\Factory;
 
 use Psr\Http\Message\ResponseFactoryInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UploadedFileInterface;
@@ -29,7 +27,6 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  * Builds Psr\HttpMessage instances using a PSR-17 implementation.
  *
  * @author Antonio J. García Lagar <aj@garcialagar.es>
- * @author Aurélien Pillevesse <aurelienpillevesse@hotmail.fr>
  */
 class PsrHttpFactory implements HttpMessageFactoryInterface
 {
@@ -48,8 +45,6 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return ServerRequestInterface
      */
     public function createRequest(Request $symfonyRequest)
     {
@@ -72,28 +67,12 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
 
         $body = $this->streamFactory->createStreamFromResource($symfonyRequest->getContent(true));
 
-        if (method_exists(Request::class, 'getContentTypeFormat')) {
-            $format = $symfonyRequest->getContentTypeFormat();
-        } else {
-            $format = $symfonyRequest->getContentType();
-        }
-
-        if ('json' === $format) {
-            $parsedBody = json_decode($symfonyRequest->getContent(), true, 512, \JSON_BIGINT_AS_STRING);
-
-            if (!\is_array($parsedBody)) {
-                $parsedBody = null;
-            }
-        } else {
-            $parsedBody = $symfonyRequest->request->all();
-        }
-
         $request = $request
             ->withBody($body)
             ->withUploadedFiles($this->getFiles($symfonyRequest->files->all()))
             ->withCookieParams($symfonyRequest->cookies->all())
             ->withQueryParams($symfonyRequest->query->all())
-            ->withParsedBody($parsedBody)
+            ->withParsedBody($symfonyRequest->request->all())
         ;
 
         foreach ($symfonyRequest->attributes->all() as $key => $value) {
@@ -105,8 +84,10 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
 
     /**
      * Converts Symfony uploaded files array to the PSR one.
+     *
+     * @return array
      */
-    private function getFiles(array $uploadedFiles): array
+    private function getFiles(array $uploadedFiles)
     {
         $files = [];
 
@@ -127,8 +108,10 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
 
     /**
      * Creates a PSR-7 UploadedFile instance from a Symfony one.
+     *
+     * @return UploadedFileInterface
      */
-    private function createUploadedFile(UploadedFile $symfonyUploadedFile): UploadedFileInterface
+    private function createUploadedFile(UploadedFile $symfonyUploadedFile)
     {
         return $this->uploadedFileFactory->createUploadedFile(
             $this->streamFactory->createStreamFromFile(
@@ -143,8 +126,6 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return ResponseInterface
      */
     public function createResponse(Response $symfonyResponse)
     {

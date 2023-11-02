@@ -627,12 +627,4 @@ class CurlFactory implements CurlFactoryInterface
             return \strlen($h);
         };
     }
-
-    public function __destruct()
-    {
-        foreach ($this->handles as $id => $handle) {
-            \curl_close($handle);
-            unset($this->handles[$id]);
-        }
-    }
 }

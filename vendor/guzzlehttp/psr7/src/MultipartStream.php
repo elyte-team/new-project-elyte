@@ -137,7 +137,9 @@ final class MultipartStream implements StreamInterface
         // Set a default Content-Type if one was not supplied
         $type = $this->getHeader($headers, 'content-type');
         if (!$type && ($filename === '0' || $filename)) {
-            $headers['Content-Type'] = MimeType::fromFilename($filename) ?? 'application/octet-stream';
+            if ($type = MimeType::fromFilename($filename)) {
+                $headers['Content-Type'] = $type;
+            }
         }
 
         return [$stream, $headers];
