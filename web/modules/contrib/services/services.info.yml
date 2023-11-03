@@ -1,0 +1,14 @@
+name: Services
+type: module
+description: A standardized solution of integrating external applications with Drupal.
+core_version_requirement: ^10
+package: Services
+dependencies:
+  - ctools:ctools
+  - drupal:serialization
+  - drupal:path_alias
+
+# Information added by Drupal.org packaging script on 2022-12-18
+version: '5.0.0-beta7'
+project: 'services'
+datestamp: 1671399710

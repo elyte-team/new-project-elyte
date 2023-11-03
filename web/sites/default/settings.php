@@ -861,7 +861,7 @@ $settings['migrate_node_migrate_type_classic'] = FALSE;
 #   include $app_root . '/' . $site_path . '/settings.local.php';
 # }
 $databases['default']['default'] = array (
-  'database' => 'adminserver',
+  'database' => 'alpha_ariel',
   'username' => 'elyte',
   'password' => 'elyte187960#',
   'prefix' => '',
